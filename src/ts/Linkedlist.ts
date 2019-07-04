@@ -1,42 +1,39 @@
+import { Http2Session } from "http2";
+
 export interface ILinkedList<T> {
   append(value: T): T;
   get(index: number): T;
   remove(value: T): T;
   removeAt(index: number): T;
+  size: number;
 }
 
 export default class LinkedList<T> implements ILinkedList<T>, Iterator<T> {
-  private head: Node<T>;
-  private size: number = 0;
-  private curIteratorNode: Node<T> = null;
+  private _head: Node<T>;
+  private _size: number = 0;
+  private _curIteratorNode: Node<T> = null;
 
   constructor(...args: T[]) {
     if (!args) {
-      this.head = null;
+      this._head = null;
       return;
     }
 
-    const [headValue] = args;
-    this.head = this.createNode(headValue, null);
-
-    let curNode = this.head;
-
-    for (let i = 1; i < args.length; i++) {
-      curNode.next = this.createNode(args[i]);
-      curNode = curNode.next;
+    for (let arg of args) {
+      this.append(arg);
     }
   }
 
   public append(value: T): T {
-    if (!this.head) {
-      this.head = this.createNode(value);
-      this.size++;
-      return this.head.value;
+    if (!this._head) {
+      this._head = this.createNode(value);
+      this._size++;
+      return this._head.value;
     }
 
     const lastNode = this.getNodeAt(this.size - 1);
     lastNode.next = this.createNode(value);
-    this.size++;
+    this._size++;
     return value;
   }
 
@@ -46,9 +43,9 @@ export default class LinkedList<T> implements ILinkedList<T>, Iterator<T> {
 
   public removeAt(index: number): T {
     if (index === 0) {
-      const { value } = this.head;
-      this.head = null;
-      this.size--;
+      const { value } = this._head;
+      this._head = null;
+      this._size--;
       return value;
     }
 
@@ -61,23 +58,23 @@ export default class LinkedList<T> implements ILinkedList<T>, Iterator<T> {
     const removedValue = (nodeBeforeTarget.next || { value: null }).value;
     
     nodeBeforeTarget.next = (nodeBeforeTarget.next || { next: null }).next;
-    this.size--;
+    this._size--;
 
     return removedValue;
   }
 
   public remove(targetValue: T): T {
-    if (!this.head) {
+    if (!this._head) {
       return null;
     }
 
-    if (this.head.value === targetValue) {
-      const { value: removedValue } = this.head;
-      this.head = null;
+    if (this._head.value === targetValue) {
+      const { value: removedValue } = this._head;
+      this._head = null;
       return removedValue;
     }
 
-    let curNode = this.head;
+    let curNode = this._head;
     while (curNode.next && curNode.value !== targetValue) {
       curNode = curNode.next;
     }
@@ -91,9 +88,13 @@ export default class LinkedList<T> implements ILinkedList<T>, Iterator<T> {
     return removedValue;
   }
 
+  get size() {
+    return this._size;
+  }
+
   // Iterator methods
   public next(): IteratorResult<T> {
-    const nextNode = (this.curIteratorNode && this.curIteratorNode.next) || null;
+    const nextNode = (this._curIteratorNode && this._curIteratorNode.next) || null;
 
     if (!nextNode) {
       return {
@@ -102,7 +103,7 @@ export default class LinkedList<T> implements ILinkedList<T>, Iterator<T> {
       }
     }
 
-    this.curIteratorNode = nextNode;
+    this._curIteratorNode = nextNode;
     return {
       done: !!nextNode.next,
       value: nextNode.value
@@ -122,7 +123,7 @@ export default class LinkedList<T> implements ILinkedList<T>, Iterator<T> {
       return null;
     }
 
-    let curNode = this.head;
+    let curNode = this._head;
     for (let i = 0; i < index && curNode; i++, curNode = curNode.next) {}
 
     return curNode;
