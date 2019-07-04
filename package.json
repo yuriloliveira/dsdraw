@@ -1,0 +1,16 @@
+{
+  "name": "dsdraw.io",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Yuri Luiz de Oliveira",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.5.2",
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.5"
+  }
+}
